@@ -1,0 +1,203 @@
+#!/bin/bash
+#
+
+#lowercase and echo back the recived string
+lc(){ # arg1 - string to lowercase
+	echo ${1,,}
+}
+
+#uppercase and echo back the recived string
+uc(){ # arg1 - string to uppercase
+	echo ${1^^}
+}
+
+helpfunc(){ #help function was called, print the information and exit
+
+	echo "[-r] [-u/-l] <dir/filename>"
+	echo "[-r] <sed pattern> <dir/filename>"
+
+	echo "-h help"
+	echo "-r use recurssion"
+
+	echo "-l change to lowercase"
+	echo "-u change to uppercase"
+
+	echo "<sed pattern>"
+	echo "<dir/filename> name of file or directory"
+	exit 1
+}
+#renames given file
+
+rename(){ # arg1-filename arg2-u/l
+	local oldname=$1 #save old file path
+	local fpath=$(dirname "$1") #get dirname and save it
+	local fname=$(basename "$1") #get filename and save it
+
+	case "$2" in #check if the name needs to lower or uppercased
+		"-u") local new=$(uc "$fname");; #uppered
+		"-l") local new=$(lc "$fname");; #lowered
+		*)    echo "wrong parameter..."
+	esac
+	
+	local newname="$fpath/$new" #create path with the new name
+	
+	#in case old and new is the same, check. 
+	if [ "$oldname" != "$newname" ]; then
+		mv $oldname $newname	#change name
+	fi	
+}
+
+#recursive mode
+rcr(){
+	
+	# -u/-l or sed
+	local ft="${1:0:2}" #get 2 first letters of $1
+	#check if lower or uppercase operation is to be performed
+	if [[ "$ft" == "-u" ]] || [[ "$ft" == "-l" ]]; then
+		Rford "$1" "$2"	
+	elif [[ "$ft" == "s/" ]]; then #or if sed command is issued
+		Rsedopt "$1" "$2"
+	else #none? Then wrong input was given
+		echo "wrong input"
+	fi
+}
+#Recursive File or Dir - rename all files, in child dirs too
+Rford(){
+	if [[ -d $2 ]]; then #check if $2 is a dir
+		#it is. Make a variable with path and /* to use all 			#files in dir
+
+		Dirvar="$2/*" 
+		
+		#foreach file/dir in the given dir call Rford again
+
+		for file in $Dirvar 
+		do
+			Rford "$1" "$file"
+		done
+	
+	elif [[ -f $2 ]]; then #$2 is a file, rename it
+		rename "$2" "$1"
+	else
+		#something is wrong, the file/dir in $2 doesnt exist
+		echo "File/Dir doesnt exist R"
+		echo "$2"
+		exit 1
+	fi
+}
+
+#Rename files, but not in child dirs.
+ford(){ #arg1 u/l arg2 filename/dir file or dir
+
+	#check if $2 is a dir		
+	if [[ -d $2 ]]; then
+		#it is. Make a variable with path and /* to use all 			#files in dir
+
+		Dirvar="$2/*"
+
+		for file in $Dirvar #call rename for every file in $2
+		do
+			rename "$file" "$1"
+		done
+
+	elif [[ -f $2 ]]; then	#$2 is a file, rename it
+		rename "$2" "$1"
+	else
+		#something is wrong, the file/dir in $2 doesnt exist
+		echo "File/Dir doesnt exist "
+		echo "$2"
+		exit 1
+	fi
+}
+
+#script was told to run sed on files
+sedopt(){
+
+	#As above, check if is a file or dir, no calling into child dir
+	if [[ -d $2 ]]; then
+		Dirvar="$2/*"
+		for file in $Dirvar #run sed on every one
+		do
+			sed -i "$1" "$file"
+		done
+	elif [[ -f $2 ]]; then
+		sed -i "$1" "$2" #file, run sed on it
+	else
+		echo "File/Dir doesnt exist"
+		echo "$2"
+		exit 1
+	fi
+}
+
+#same as above but also go into child dirs (recursivlly)
+Rsedopt(){
+	#echo "sedopt"
+	if [[ -d $2 ]]; then
+		Dirvar="$2/*"
+		for file in $Dirvar #do dir stuff
+		do
+			Rsedopt "$1" "$file"
+		done
+	elif [[ -f $2 ]]; then
+		sed -i "$1" "$2" #do file stuff
+	else
+		echo "File/Dir doesnt exist R"
+		echo "$2"
+		exit 1
+	fi
+}
+
+#normal mode (insted of rcr() )
+norm(){
+	local ft="${1:0:2}" #get 2 first letters of operation / $2
+	
+	#check if it is instruction to upper/lowercase
+	if [[ "$ft" == "-u" ]] || [[ "$ft" == "-l" ]]; then
+		ford "$1" "$2"	
+		#up/lowercase, call func to check if it is 
+		#file or dir and rename accordingly
+	elif [[ "$ft" == "s/" ]]; then 
+		#or the insstruction is to issue sed on given file/dir
+		sedopt "$1" "$2" 
+	else #if none of the above then something is wrong
+		echo "wrong input"
+	fi
+
+}
+
+
+#main
+
+if [[ "$1" == "-h" ]]; then #check if the script was called in help mode. Help function will exit on its own.
+	helpfunc ;
+fi
+
+#check if the script is to run in recurence mode. If so, save the information and perform shift of the parameters
+if [[ "$1" == "-r" ]]; then
+	mode="$1"
+	shift
+fi
+
+#save what operation is to be performed and shift
+oper="$1"
+shift
+
+#all parameters that are left are the files/dirs that are to be worked on
+
+
+
+while [[ "$#" > 0 ]]; do	
+	#first parameter is the one that needs to be worked on
+	#set it as current destination
+	dest="$1"
+
+	if [[ "$mode" == "-r" ]]; then #mode was set to run recurence
+		rcr "$oper" "$dest"
+	else #mode was not set to run recurence, run normally
+		norm "$oper" "$dest"
+	fi
+	shift #shift to the next param
+
+done
+
+
+

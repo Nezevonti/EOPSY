@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+
+#Tests showing it wor
+
+
+bash modify -l /home/vm/Documents/TestFiles/TestL
+#All files in TestL schould be lowercase but not in child dir
+
+bash modify -r -l /home/vm/Documents/TestFiles/TestLR
+#All files in TestLR schould be lowercase AS WELL AS IN CHILD DIR
+
+bash modify -u /home/vm/Documents/TestFiles/TestU
+#All files in TestL schould be lowercase but not in child dir
+
+bash modify -r -u /home/vm/Documents/TestFiles/TestUR
+#All files in TestLR schould be lowercase AS WELL AS IN CHILD DIR
+
+
+bash modify 's/bombelki/ponczki/g' /home/vm/Documents/TestFiles/TestSED
+#All files in TestSED schould be have 'bombelki' replaced to ponczki
+#But not in child dir (File TEST and TestCOPY)
+
+bash modify -r 's/bombelki/ponczki/g' /home/vm/Documents/TestFiles/TestSEDR
+#All files in TestSED schould be have 'bombelki' replaced to ponczki
+#And in child dir same (File TEST and TestCOPY)
+
+#Something wrong and it checks it
+#bash modify /home/vm/Documents/TestFiles/TestL
