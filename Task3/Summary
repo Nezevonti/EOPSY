@@ -1,0 +1,15 @@
+2 Processes
+Blocked 3 times each.
+Run for 4000 (Mean * 2)
+Both processes run alonside each other, not by waiting for one to complete before starting the next one. Both processes were blocked at the same times: 500/1000/1500
+
+5 Processes
+Blocked 3 times (each), same as in case of 2 processes.
+Run for 10000 (5 processes * mean of 2000), reaching the max. allowed time but the simulation was not bound by it, as it finished just as the time run out.
+Looks like the processes run in pairs (first 0&1, when that pair is done 2&3, and when those two are done - 4). If there were 6 processes then both 4&5 would be cut right in the middle of its execution.
+
+
+10 Processes
+Runs for the allowed max (10000)
+Blocked up to 3 times. (The completed ones 3 times, the ones that were cut short - 2 or 1 blocks). It may be that if there was even a 1ms more time both of the 3rd pair would be on 2 blocks. The later ones didnt even start running.
+Processes again run in pairs. 
