@@ -1,0 +1,4 @@
+Parameters (number of barbeers/ waiting room size) are implemented by #define at the beginning of the file.
+Change the values, save and compile. 
+To compile :
+gcc -pthread main.c -o <program_name>
