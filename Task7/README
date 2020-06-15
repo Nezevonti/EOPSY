@@ -12,3 +12,10 @@ Ctrl+C (interrupt signal) doesn't quit the program.
 It instead shows the statistic of philosophers eating (Who ate how many times)
 To quit use :
 Ctrl + \
+
+
+After the presentation during the labs I added :
+-Comments
+-Time warp functionality
+-Handling (printing information) of situations when the philosopher cannot eat (explanation why)
+-Eating statistic with interrupt handling
