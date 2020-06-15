@@ -1,0 +1,14 @@
+To compile use :
+> gcc -pthread PhilMain.c -o <output_file_name>
+
+To run ./<output_file_name>.<extension>
+
+The parameters are predefined at the top of the file. 
+N - number of philosophers
+TIMEWARP - change to control the speed of the simulation. Explained in the file.
+
+!WARNING!
+Ctrl+C (interrupt signal) doesn't quit the program.
+It instead shows the statistic of philosophers eating (Who ate how many times)
+To quit use :
+Ctrl + \
